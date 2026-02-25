@@ -1,0 +1,7 @@
+# Ignore build artifacts
+[Bb]in/
+[Oo]bj/
+
+# Ignore IDE settings
+.vs/
+.vscode/
