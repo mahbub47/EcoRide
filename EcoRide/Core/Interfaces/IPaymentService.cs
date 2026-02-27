@@ -6,6 +6,6 @@ namespace EcoRide.Core.Interfaces
 {
     public interface IPaymentService
     {
-        void ProcessPayment(string userId, decimal amount);
+        bool ProcessPayment(string userId, decimal amount);
     }
 }

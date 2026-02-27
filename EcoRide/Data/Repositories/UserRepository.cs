@@ -10,18 +10,19 @@ namespace EcoRide.Data.Repositories
 {
     public class UserRepository : IRepository<User>
     {
-        private readonly SqlConnection _connection;
+        private readonly SqlDbConnection _connector;
 
         public UserRepository()
         {
-            _connection = SqlDbConnection.Instance.Connect();
+            //_connection = SqlDbConnection.Instance.Connect();
+            _connector = new SqlDbConnection();
         }
 
         public async Task<User> GetByIdAsync(string id)
         {
             try
             {
-                using var conn = _connection;
+                using var conn = _connector.Connect();
                 await conn.OpenAsync();
                 string query = "SELECT Id, Name, Phone FROM Users WHERE Id = @Id";
                 using var cmd = new SqlCommand(query, conn);
@@ -48,7 +49,7 @@ namespace EcoRide.Data.Repositories
             var users = new List<User>();
             try
             {
-                using var conn = _connection;
+                using var conn = _connector.Connect();
                 await conn.OpenAsync();
                 string query = "SELECT Id, Name, Phone FROM Users";
                 using var cmd = new SqlCommand(query, conn);
@@ -72,7 +73,7 @@ namespace EcoRide.Data.Repositories
         {
             try
             {
-                using var conn = _connection;
+                using var conn = _connector.Connect();
                 await conn.OpenAsync();
                 string query = "INSERT INTO Users (Id, Name, Phone) VALUES (@Id, @Name, @Phone)";
                 using var cmd = new SqlCommand(query, conn);
@@ -92,7 +93,7 @@ namespace EcoRide.Data.Repositories
         {
             try
             {
-                using var conn = _connection;
+                using var conn = _connector.Connect();
                 await conn.OpenAsync();
                 string query = "DELETE FROM Users WHERE Id = @Id";
                 using var cmd = new SqlCommand(query, conn);
@@ -109,7 +110,7 @@ namespace EcoRide.Data.Repositories
         {
             try
             {
-                using var conn = _connection;
+                using var conn = _connector.Connect();
                 await conn.OpenAsync();
                 string query = "UPDATE Users SET Name = @Name, Phone = @Phone WHERE Id = @Id";
                 using var cmd = new SqlCommand(query, conn);
@@ -125,22 +126,22 @@ namespace EcoRide.Data.Repositories
             }
         }
 
-        public Task<bool> ExistsAsync(string id)
+        public async Task<bool> ExistsAsync(string id)
         {
             try
             {
-                using var conn = _connection;
-                conn.Open();
+                using var conn = _connector.Connect();
+                await conn.OpenAsync();
                 string query = "SELECT COUNT(1) FROM Users WHERE Id = @Id";
                 using var cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@Id", id);
                 int count = (int)cmd.ExecuteScalar();
-                return Task.FromResult(count > 0);
+                return count > 0;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"An error occurred while checking if the user exists: {ex.Message}");
-                return Task.FromResult(false);
+                return false;
             }
         }
     } 

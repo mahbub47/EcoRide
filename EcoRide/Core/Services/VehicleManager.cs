@@ -24,6 +24,11 @@ namespace EcoRide.Core.Services
             return vehicle;
         }
 
+        public List<Vehicle> GetVehicles()
+        {
+            return _vehicleRepository.GetAllAsync().Result.ToList();
+        }
+
         public List<Vehicle> GetAvailableVehicles()
         {
             return _vehicleRepository.GetAvailableVehicle().Result.ToList();

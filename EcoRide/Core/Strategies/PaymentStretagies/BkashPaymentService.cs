@@ -7,9 +7,10 @@ namespace EcoRide.Core.Strategies.PaymentStretagies
 {
     internal class BkashPaymentService : IPaymentService
     {
-        public void ProcessPayment(string userId, decimal amount)
+        public bool ProcessPayment(string userId, decimal amount)
         {
-            throw new NotImplementedException();
+            Console.WriteLine($"Processing Bkash payment for user {userId} with amount {amount}");
+            return true;
         }
     }
 }

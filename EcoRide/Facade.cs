@@ -12,12 +12,14 @@ namespace EcoRide
         private readonly UserManager _userManager;
         private readonly VehicleManager _vehicleManager;
         private readonly BookingManager _bookingManager;
+        private readonly PaymentManager _paymentManager;
 
         public Facade()
         {
             _userManager = new();
             _vehicleManager = new();
             _bookingManager = new();
+            _paymentManager = new();
         }
 
         public User RegisterUser(string name, string phone)
@@ -50,6 +52,11 @@ namespace EcoRide
             return _vehicleManager.CreateVehicle(licensePlate, type);
         }
 
+        public List<Vehicle> GetVehicles()
+        {
+            return _vehicleManager.GetVehicles();
+        }
+
         public List<Vehicle> GetAvailableVehicles()
         {
             return _vehicleManager.GetAvailableVehicles();
@@ -72,8 +79,16 @@ namespace EcoRide
 
         public void PayForBooking(string bookingId, decimal amount)
         {
-            // Implement payment logic here, e.g., integrate with a payment gateway
-            Console.WriteLine($"Processing payment for booking {bookingId} with amount {amount}...");
+            _paymentManager.ProcessPayment(bookingId, amount);
+        }
+
+        public void DeleteVehicle(string vehicleId)
+        {
+            var vehicle = _vehicleManager.GetVehicles().Find(v => v.Id == vehicleId);
+            if (vehicle != null)
+            {
+                _bookingManager.unbookVehicle(vehicleId);
+            }
         }
     }
 }

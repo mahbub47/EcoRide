@@ -29,7 +29,7 @@ namespace EcoRide.Core.Services
         {
             var vehicle = new VehicleRepository().GetByIdAsync(vehicleId).Result;
             var totalPrice = _pricingStrategy.CalculatePrice(vehicle.BasePrice, durationInHour);
-            var booking = new Booking(userId, vehicleId, durationInHour, totalPrice);
+            var booking = new Booking(userId, vehicleId, durationInHour, totalPrice, false);
             new VehicleRepository().MarkAsBookedAsync(vehicleId).Wait();
             _bookingRepository.AddAsync(booking).Wait();
             return booking;
@@ -37,7 +37,9 @@ namespace EcoRide.Core.Services
 
         public void unbookVehicle(string vehicleId)
         {
+            var vehicle = new VehicleRepository().GetByIdAsync(vehicleId).Result;
             new VehicleRepository().MarkAsAvailableAsync(vehicleId).Wait();
+            _bookingRepository.DeleteByVehicle(vehicleId).Wait();
         }
     }
 }

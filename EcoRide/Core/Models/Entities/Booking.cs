@@ -12,12 +12,15 @@ namespace EcoRide.Core.Models.Entities
         public int DurationInHours { get; set; }
         public decimal TotalPrice { get; set; }
 
-        public Booking(string userId, string vehicleId, int durationInHours, decimal totalPrice)
+        public bool PaymentStatus { get; set; }
+
+        public Booking(string userId, string vehicleId, int durationInHours, decimal totalPrice, bool paymentStatus)
         {
             Id = Guid.NewGuid().ToString();
             UserId = userId;
             VehicleId = vehicleId;
             DurationInHours = durationInHours;
+            PaymentStatus = paymentStatus;
             TotalPrice = totalPrice;
         }
     }

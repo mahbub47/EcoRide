@@ -6,9 +6,11 @@ namespace EcoRide.ConsoleApp
 {
     internal class ConsoleApp
     {
-        //public static void Main(string[] args)
-        //{
-
-        //}
+        public static void Main(string[] args)
+        {
+            Console.WriteLine("================== WELCOME TO ECORIDE =================");
+            var system = new Facade();
+            MenuHandler.DisplayMenu(system);
+        }
     }
 }

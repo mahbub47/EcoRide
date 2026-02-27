@@ -8,20 +8,21 @@ using System.Text;
 
 namespace EcoRide.Data.Repositories
 {
-    public class BookingRepository : IRepository<Booking>
+    public class BookingRepository : IRepository<Booking>, IBookingRepository 
     {
-        private readonly SqlConnection _connection;
+        private readonly SqlDbConnection _connector;
 
         public BookingRepository()
         {
-            _connection = SqlDbConnection.Instance.Connect();
+            //_connection = SqlDbConnection.Instance.Connect();
+            _connector = new SqlDbConnection();
         }
 
         public async Task AddAsync(Booking booking)
         {
             try
             {
-                using var conn = _connection;
+                using var conn = _connector.Connect();
                 conn.Open();
                 var query = "INSERT INTO Bookings (Id, UserId, VehicleId, BookingHour, TotalPrice, PaymentStatus) VALUES (@Id, @UserId, @VehicleId, @BookingHour, @TotalPrice, @PaymentStatus)";
                 using var cmd = new SqlCommand(query, conn);
@@ -44,7 +45,7 @@ namespace EcoRide.Data.Repositories
         {
             try
             {
-                using var conn = _connection;
+                using var conn = _connector.Connect();
                 await conn.OpenAsync();
                 string query = "DELETE FROM Bookings WHERE Id = @Id";
                 using var cmd = new SqlCommand(query, conn);
@@ -57,12 +58,29 @@ namespace EcoRide.Data.Repositories
             }
         }
 
+        public async Task DeleteByVehicle(string vehicleId)
+        {
+            try
+            {
+                using var conn = _connector.Connect();
+                await conn.OpenAsync();
+                string query = "DELETE FROM Bookings WHERE VehicleId = @VehicleId";
+                using var cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@VehicleId", vehicleId);
+                await cmd.ExecuteNonQueryAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting booking by vehicle: {ex.Message}");
+            }
+        }
+
         public async Task<bool> ExistsAsync(string id)
         {
             try
             {
-                using var conn = _connection;
-                conn.OpenAsync();
+                using var conn = _connector.Connect();
+                await conn.OpenAsync();
                 string query = "SELECT COUNT(1) FROM Bookings WHERE Id = @Id";
                 using var cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@Id", id);
@@ -80,14 +98,14 @@ namespace EcoRide.Data.Repositories
         {
             try
             {
-                using var conn = _connection;
-                conn.OpenAsync();
-                string query = "SELECT Id, UserId, VehicleId, BookingHour, TotalPrice FROM Bookings";
+                using var conn = _connector.Connect();
+                await conn.OpenAsync();
+                string query = "SELECT Id, UserId, VehicleId, BookingHour, TotalPrice, PaymentStatus FROM Bookings";
                 using var cmd = new SqlCommand(query, conn);
                 using var reader = await cmd.ExecuteReaderAsync();
                 var bookings = new List<Booking>();
                 while (reader.Read()) {
-                    bookings.Add(new Booking(reader.GetString(1), reader.GetString(2), reader.GetInt32(3), reader.GetDecimal(4)));
+                    bookings.Add(new Booking(reader.GetString(1), reader.GetString(2), reader.GetInt32(3), reader.GetDecimal(4), reader.GetBoolean(5)));
                 }
                 return bookings;
             }
@@ -102,13 +120,17 @@ namespace EcoRide.Data.Repositories
         {
             try
             {
-                using var conn = _connection;
+                using var conn = _connector.Connect();
                 await conn.OpenAsync();
-                string query = "SELECT Id, UserId, VehicleId, BookingHour, TotalPrice FROM Bookings WHERE Id = @Id";
+                string query = "SELECT Id, UserId, VehicleId, BookingHour, TotalPrice, PaymentStatus FROM Bookings WHERE Id = @Id";
                 using var cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@Id", id);
                 using var reader = await cmd.ExecuteReaderAsync();
-                return reader.Read() ? new Booking(reader.GetString(1), reader.GetString(2), reader.GetInt32(3), reader.GetDecimal(4)) : null;
+                if (reader.Read())
+                {
+                    return new Booking(reader.GetString(1), reader.GetString(2), reader.GetInt32(3), reader.GetDecimal(4), reader.GetBoolean(5));
+                }
+                return null;
             }
             catch (Exception ex)
             {
@@ -117,12 +139,29 @@ namespace EcoRide.Data.Repositories
             }
         }
 
+        public async Task MarkAsPaid(string bookingId)
+        {
+            try
+            {
+                using var conn = _connector.Connect();
+                await conn.OpenAsync();
+                string query = "UPDATE Bookings SET PaymentStatus = 1 WHERE Id = @Id";
+                using var cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@Id", bookingId);
+                await cmd.ExecuteNonQueryAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error marking booking as paid: {ex.Message}");
+            }
+        }
+
         public async Task UpdateAsync(Booking booking)
         {
             try
             {
-                using var conn = _connection;
-                conn.OpenAsync();
+                using var conn = _connector.Connect();
+                await conn.OpenAsync();
                 string query = "UPDATE Bookings SET UserId = @UserId, VehicleId = @VehicleId, BookingHour = @BookingHour, TotalPrice = @TotalPrice WHERE Id = @Id";
                 using var cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@Id", booking.Id);
