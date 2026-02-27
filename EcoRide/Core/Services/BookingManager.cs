@@ -1,5 +1,7 @@
-﻿using EcoRide.Core.Models.Entities;
+﻿using EcoRide.Core.Interfaces;
+using EcoRide.Core.Models.Entities;
 using EcoRide.Core.Strategies;
+using EcoRide.Core.Strategies.PricingStrategies;
 using EcoRide.Data.Repositories;
 using System;
 using System.Collections.Generic;

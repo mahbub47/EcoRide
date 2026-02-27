@@ -23,13 +23,14 @@ namespace EcoRide.Data.Repositories
             {
                 using var conn = _connection;
                 conn.Open();
-                var query = "INSERT INTO Bookings (Id, UserId, VehicleId, BookingHour, TotalPrice) VALUES (@Id, @UserId, @VehicleId, @BookingHour, @TotalPrice)";
+                var query = "INSERT INTO Bookings (Id, UserId, VehicleId, BookingHour, TotalPrice, PaymentStatus) VALUES (@Id, @UserId, @VehicleId, @BookingHour, @TotalPrice, @PaymentStatus)";
                 using var cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@Id", booking.Id);
                 cmd.Parameters.AddWithValue("@UserId", booking.UserId);
                 cmd.Parameters.AddWithValue("@VehicleId", booking.VehicleId);
                 cmd.Parameters.AddWithValue("@BookingHour", booking.DurationInHours);
                 cmd.Parameters.AddWithValue("@TotalPrice", booking.TotalPrice);
+                cmd.Parameters.AddWithValue("@PaymentStatus", 0);
                 await cmd.ExecuteNonQueryAsync();
                 Console.WriteLine("Booking inserted successfully.");
             }
@@ -102,7 +103,7 @@ namespace EcoRide.Data.Repositories
             try
             {
                 using var conn = _connection;
-                conn.OpenAsync();
+                await conn.OpenAsync();
                 string query = "SELECT Id, UserId, VehicleId, BookingHour, TotalPrice FROM Bookings WHERE Id = @Id";
                 using var cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@Id", id);

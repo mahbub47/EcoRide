@@ -206,5 +206,29 @@ namespace EcoRide.Data.Repositories
                 Console.WriteLine($"Error marking vehicle as available: {ex.Message}");
             }
         }
+
+        public async Task<IEnumerable<Vehicle>> GetAvailableVehicleByType(string type)
+        {
+            try
+            {
+                using var conn = _connection;
+                await conn.OpenAsync();
+                var query = "SELECT Id, PlateNumber, IsAvailable, BasePrice, Type FROM Vehicles WHERE IsAvailable = 1 AND Type = @Type";
+                using var cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@Type", type);
+                using var reader = cmd.ExecuteReader();
+                var vehicles = new List<Vehicle>();
+                while (reader.Read())
+                {
+                    vehicles.Add(VehicleFactory.CreateVehicle(reader.GetString(4), reader.GetString(0), reader.GetString(1), reader.GetBoolean(2)));
+                }
+                return vehicles;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching available vehicles by type: {ex.Message}");
+                return new List<Vehicle>();
+            }
+        }
     }
 }

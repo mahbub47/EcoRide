@@ -21,7 +21,8 @@ namespace EcoRide
             //}
             //var vehicle1 = system.RegisterVehicle("FGH-456", "Bike");
             //Console.WriteLine($"Vehicle registered: {vehicle1.GetType().Name}, {vehicle1.PlateNumber}");
-            var vehicles = system.GetAvailableVehicles();
+            //var vehicles = system.GetAvailableVehicles();
+            var vehicles = system.GetAvailableVehiclesByType("Car");
             if (vehicles.Count == 0)
             {
                 Console.WriteLine("No available vehicles.");

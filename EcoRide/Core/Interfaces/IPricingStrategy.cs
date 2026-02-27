@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace EcoRide.Core.Strategies
+namespace EcoRide.Core.Interfaces
 {
     public interface IPricingStrategy
     {

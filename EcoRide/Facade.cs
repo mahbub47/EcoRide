@@ -55,6 +55,11 @@ namespace EcoRide
             return _vehicleManager.GetAvailableVehicles();
         }
 
+        public List<Vehicle> GetAvailableVehiclesByType(string type)
+        {
+            return _vehicleManager.GetAvailableVehiclesByType(type);
+        }
+
         public Booking CreateBooking(string userId, string vehicleId, int durationInHour)
         {
             return _bookingManager.CreateBooking(userId, vehicleId, durationInHour);
@@ -63,6 +68,12 @@ namespace EcoRide
         public void UnbookVehicle(string vehicleId)
         {
             _bookingManager.unbookVehicle(vehicleId);
+        }
+
+        public void PayForBooking(string bookingId, decimal amount)
+        {
+            // Implement payment logic here, e.g., integrate with a payment gateway
+            Console.WriteLine($"Processing payment for booking {bookingId} with amount {amount}...");
         }
     }
 }

@@ -9,6 +9,7 @@ namespace EcoRide.Core.Interfaces
     public interface IVehicleRepository
     {
         Task<IEnumerable<Vehicle>> GetAvailableVehicle();
+        Task<IEnumerable<Vehicle>> GetAvailableVehicleByType(string type);
         Task MarkAsBookedAsync(string id);
         Task MarkAsAvailableAsync(string id);
     }
