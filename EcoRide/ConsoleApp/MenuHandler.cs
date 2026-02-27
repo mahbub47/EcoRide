@@ -65,6 +65,7 @@ namespace EcoRide.ConsoleApp
                         ConsoleUtils.UnbookVehicle(system);
                         break;
                     case "exit":
+                        exit = true;
                         break;
                 }
             }

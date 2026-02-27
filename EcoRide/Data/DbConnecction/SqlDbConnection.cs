@@ -7,11 +7,11 @@ namespace EcoRide.Data.DbConnecction
 {
     public class SqlDbConnection
     {
-        //private static readonly Lazy<SqlDbConnection> _instance = new(() => new SqlDbConnection());
-        //public static SqlDbConnection Instance => _instance.Value;
+        private static readonly Lazy<SqlDbConnection> _instance = new(() => new SqlDbConnection());
+        public static SqlDbConnection Instance => _instance.Value;
         public string ConnectionString { get; }
 
-        public SqlDbConnection()
+        private SqlDbConnection()
         {
             var config = new ConfigurationBuilder()
                             .SetBasePath(Directory.GetCurrentDirectory())

@@ -14,8 +14,7 @@ namespace EcoRide.Data.Repositories
 
         public UserRepository()
         {
-            //_connection = SqlDbConnection.Instance.Connect();
-            _connector = new SqlDbConnection();
+            _connector = SqlDbConnection.Instance;
         }
 
         public async Task<User> GetByIdAsync(string id)
