@@ -1,4 +1,5 @@
-﻿using EcoRide.Core.Models.Entities;
+﻿using EcoRide.Core.Models.Base;
+using EcoRide.Core.Models.Entities;
 using System;
 using System.Collections.Generic;
 using System.Text;

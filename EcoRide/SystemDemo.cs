@@ -30,9 +30,9 @@ namespace EcoRide
             {
                 Console.WriteLine($"Available Vehicle: {vehicle.GetType().Name}, {vehicle.PlateNumber}, Base Price: {vehicle.BasePrice}");
             }
-
             //var booking1 = system.CreateBooking("7ecb15b9-93ff-43cf-8859-c2b67337f5ae", "6fb5d798-eebc-422c-b280-794495ed988d", 2);
             //Console.WriteLine($"Booking created: UserId={booking1.UserId}, VehicleId={booking1.VehicleId}, Duration={booking1.DurationInHours}, TotalPrice={booking1.TotalPrice}");
+            //system.UnbookVehicle("6fb5d798-eebc-422c-b280-794495ed988d");
         }
     }
 }

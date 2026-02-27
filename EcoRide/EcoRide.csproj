@@ -15,9 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Core\Models\Base\" />
     <Folder Include="Core\Models\Enums\" />
-    <Folder Include="Core\Strategies\" />
     <Folder Include="Data\Scripts\" />
   </ItemGroup>
 

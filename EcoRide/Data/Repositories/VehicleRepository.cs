@@ -1,4 +1,5 @@
 ﻿using EcoRide.Core.Interfaces;
+using EcoRide.Core.Models.Base;
 using EcoRide.Core.Models.Entities;
 using EcoRide.Data.DbConnecction;
 using EcoRide.Factory;
@@ -170,6 +171,40 @@ namespace EcoRide.Data.Repositories
                 Console.WriteLine($"Error fetching available vehicles: {ex.Message}");
             }
             return vehicles;
+        }
+
+        public async Task MarkAsBookedAsync(string id)
+        {
+            try
+            {
+                using var conn = _connection;
+                conn.Open();
+                string query = "UPDATE Vehicles SET IsAvailable = 0 WHERE Id = @Id";
+                using var cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@Id", id);
+                await cmd.ExecuteNonQueryAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error marking vehicle as booked: {ex.Message}");
+            }
+        }
+
+        public async Task MarkAsAvailableAsync(string id)
+        {
+            try
+            {
+                using var conn = _connection;
+                conn.Open();
+                string query = "UPDATE Vehicles SET IsAvailable = 1 WHERE Id = @Id";
+                using var cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@Id", id);
+                await cmd.ExecuteNonQueryAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error marking vehicle as available: {ex.Message}");
+            }
         }
     }
 }

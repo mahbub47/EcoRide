@@ -1,4 +1,5 @@
-﻿using EcoRide.Core.Models.Entities;
+﻿using EcoRide.Core.Models.Base;
+using EcoRide.Core.Models.Entities;
 using EcoRide.Core.Services;
 using System;
 using System.Collections.Generic;
@@ -57,6 +58,11 @@ namespace EcoRide
         public Booking CreateBooking(string userId, string vehicleId, int durationInHour)
         {
             return _bookingManager.CreateBooking(userId, vehicleId, durationInHour);
+        }
+
+        public void UnbookVehicle(string vehicleId)
+        {
+            _bookingManager.unbookVehicle(vehicleId);
         }
     }
 }
