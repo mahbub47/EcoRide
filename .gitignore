@@ -5,3 +5,6 @@
 # Ignore IDE settings
 .vs/
 .vscode/
+
+# Configuration files
+appsettings.json
