@@ -1,4 +1,5 @@
 ﻿using EcoRide.Core.Interfaces;
+using EcoRide.Core.Models.Base;
 using EcoRide.Core.Models.Entities;
 using EcoRide.Core.Strategies;
 using EcoRide.Core.Strategies.PricingStrategies;
@@ -12,12 +13,14 @@ namespace EcoRide.Core.Services
     public class BookingManager
     {
         private readonly BookingRepository _bookingRepository;
+        private readonly VehicleRepository _vehicleRepository;
         private IPricingStrategy _pricingStrategy;
 
-        public BookingManager()
+        public BookingManager(BookingRepository bookingRepository, VehicleRepository vehicleRepository, IPricingStrategy pricingStrategy)
         {
-            _bookingRepository = new BookingRepository();
-            _pricingStrategy = new RegularPricingStrategy();
+            _bookingRepository = bookingRepository;
+            _vehicleRepository = vehicleRepository;
+            _pricingStrategy = pricingStrategy;
         }
 
         public void SetPricingStrategy(IPricingStrategy pricingStrategy)
@@ -25,21 +28,21 @@ namespace EcoRide.Core.Services
             _pricingStrategy = pricingStrategy;
         }
 
-        public Booking CreateBooking(string userId, string vehicleId, int durationInHour)
+        public async Task<Booking> CreateBooking(string userId, string vehicleId, int durationInHour)
         {
-            var vehicle = new VehicleRepository().GetByIdAsync(vehicleId).Result;
+            var vehicle = await _vehicleRepository.GetByIdAsync(vehicleId);
             var totalPrice = _pricingStrategy.CalculatePrice(vehicle.BasePrice, durationInHour);
-            var booking = new Booking(userId, vehicleId, durationInHour, totalPrice, false);
-            new VehicleRepository().MarkAsBookedAsync(vehicleId).Wait();
-            _bookingRepository.AddAsync(booking).Wait();
+            var booking = new Booking(Guid.NewGuid().ToString(), userId, vehicleId, durationInHour, totalPrice, false);
+            await _vehicleRepository.MarkAsBookedAsync(vehicleId);
+            await _bookingRepository.AddAsync(booking);
             return booking;
         }
 
-        public void unbookVehicle(string vehicleId)
+        public async Task UnbookVehicle(string vehicleId)
         {
-            var vehicle = new VehicleRepository().GetByIdAsync(vehicleId).Result;
-            new VehicleRepository().MarkAsAvailableAsync(vehicleId).Wait();
-            _bookingRepository.DeleteByVehicle(vehicleId).Wait();
+            var vehicle = await _vehicleRepository.GetByIdAsync(vehicleId);
+            await _vehicleRepository.MarkAsAvailableAsync(vehicleId);
+            await _bookingRepository.DeleteByVehicle(vehicleId);
         }
     }
 }

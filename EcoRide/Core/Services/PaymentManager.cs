@@ -11,24 +11,30 @@ namespace EcoRide.Core.Services
     public class PaymentManager
     {
         private IPaymentService _paymentService;
+        private BookingRepository _bookingRepository;
 
-        public PaymentManager()
+        public PaymentManager(IPaymentService paymentService, BookingRepository bookingRepository)
         {
-            _paymentService = new BkashPaymentService();
+            _paymentService = paymentService;
+            _bookingRepository = bookingRepository;
         }
 
-        public void ProcessPayment(string bookingId, decimal amount)
+        public async Task<string> ProcessPayment(string bookingId, decimal amount)
         {
-            var booking = new BookingRepository().GetByIdAsync(bookingId).Result;
+            var booking = await _bookingRepository.GetByIdAsync(bookingId);
+            if(amount != booking.TotalPrice)
+            {
+                return "Payment amount does not match the booking total.";
+            }
             var isSuccess = _paymentService.ProcessPayment(booking.UserId, amount);
             if (isSuccess)
             {
-                Console.WriteLine("Payment processed successfully.");
                 new BookingRepository().MarkAsPaid(bookingId).Wait();
+                return "Payment processed successfully.";
             }
             else
             {
-                Console.WriteLine("Payment failed.");
+                return "Payment failed.";
             }
         }
     }

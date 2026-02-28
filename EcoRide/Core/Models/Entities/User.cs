@@ -10,9 +10,9 @@ namespace EcoRide.Core.Models.Entities
         public string Name { get; set; }
         public string Phone { get; set; }
 
-        public User(string name, string phone)
+        public User(string id, string name, string phone)
         {
-            Id = Guid.NewGuid().ToString();
+            Id = id;
             Name = name;
             Phone = phone;
         }

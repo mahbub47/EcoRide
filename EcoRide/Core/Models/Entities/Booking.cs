@@ -14,9 +14,9 @@ namespace EcoRide.Core.Models.Entities
 
         public bool PaymentStatus { get; set; }
 
-        public Booking(string userId, string vehicleId, int durationInHours, decimal totalPrice, bool paymentStatus)
+        public Booking(string id, string userId, string vehicleId, int durationInHours, decimal totalPrice, bool paymentStatus)
         {
-            Id = Guid.NewGuid().ToString();
+            Id = id;
             UserId = userId;
             VehicleId = vehicleId;
             DurationInHours = durationInHours;

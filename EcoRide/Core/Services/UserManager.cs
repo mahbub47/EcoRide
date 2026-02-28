@@ -10,34 +10,33 @@ namespace EcoRide.Core.Services
     {
         private readonly UserRepository _userRepository;
 
-        public UserManager()
+        public UserManager(UserRepository userRepository)
         {
-            _userRepository = new();
+            _userRepository = userRepository;
         }
 
-        public User CreateUser(string name, string phone)
+        public async Task<User> CreateUser(string name, string phone)
         {
-            var user = new User(name, phone);
-            _userRepository.AddAsync(user).Wait();
-            return user;
+            var user = new User(Guid.NewGuid().ToString(), name, phone);
+            await _userRepository.AddAsync(user);
+            var createdUser = await _userRepository.GetByIdAsync(user.Id);
+            return createdUser;
         }
 
-        public User GetUserById(string userId)
+        public async Task<User> GetUserById(string userId)
         {
-            return _userRepository.GetByIdAsync(userId).Result;
+            return await _userRepository.GetByIdAsync(userId);
         }
 
-        public User UpdateUserInformation(string userId, string name, string phone)
+        public async Task<User> UpdateUserInformation(string userId, string name, string phone)
         {
-            var user = new User(name, phone)
-            {
-                Id = userId
-            };
-            _userRepository.UpdateAsync(user).Wait();
-            return user;
+            var user = new User(userId, name, phone);
+            await _userRepository.UpdateAsync(user);
+            var updatedUser = await _userRepository.GetByIdAsync(userId);
+            return updatedUser;
         }
 
-        public async void DeleteUser(string userId)
+        public async Task DeleteUser(string userId)
         {
             var user = await _userRepository.GetByIdAsync(userId);
             if (user != null)
@@ -46,9 +45,10 @@ namespace EcoRide.Core.Services
             }
         }
 
-        public List<User> GetAllUsers()
+        public async Task<List<User>> GetAllUsers()
         {
-            return _userRepository.GetAllAsync().Result.ToList();
+            var users = await _userRepository.GetAllAsync();
+            return users.ToList();
         }
     }
 }

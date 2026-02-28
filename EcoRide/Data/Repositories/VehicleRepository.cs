@@ -39,8 +39,7 @@ namespace EcoRide.Data.Repositories
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error fetching vehicle by ID: {ex.Message}");
-                return null;
+                throw new Exception("Error fetching vehicle by ID.", ex);
             }
         }
 
@@ -54,7 +53,7 @@ namespace EcoRide.Data.Repositories
                 using var cmd = new SqlCommand(query, conn);
                 using var reader = await cmd.ExecuteReaderAsync();
                 var vehicles = new List<Vehicle>();
-                while (reader.Read())
+                while (await reader.ReadAsync())
                 {
                     var type = reader.GetString(4);
                     vehicles.Add(VehicleFactory.CreateVehicle(type, reader.GetString(0), reader.GetString(1), reader.GetBoolean(2)));
@@ -63,8 +62,7 @@ namespace EcoRide.Data.Repositories
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error fetching all vehicles: {ex.Message}");
-                return new List<Vehicle>();
+                throw new Exception("Error fetching all vehicles.", ex);
             }
         }
 
@@ -73,7 +71,7 @@ namespace EcoRide.Data.Repositories
             try
             {
                 using var conn = _connector.Connect();
-                conn.Open();
+                await conn.OpenAsync();
                 var query = "INSERT INTO Vehicles (Id, PlateNumber, IsAvailable, BasePrice, Type) VALUES (@Id, @PlateNumber, @IsAvailable, @BasePrice, @Type)";
                 using var cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@Id", vehicle.Id);
@@ -81,12 +79,11 @@ namespace EcoRide.Data.Repositories
                 cmd.Parameters.AddWithValue("@IsAvailable", vehicle.IsAvailable ? 1 : 0);
                 cmd.Parameters.AddWithValue("@BasePrice", vehicle.BasePrice);
                 cmd.Parameters.AddWithValue("@Type", vehicle.GetType().Name);
-                cmd.ExecuteNonQuery();
-                Console.WriteLine("Vehicle inserted successfully.");
+                await cmd.ExecuteNonQueryAsync();
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error inserting vehicle: {ex.Message}");
+                throw new Exception("Error inserting vehicle.", ex);
             }
         }
 
@@ -100,11 +97,10 @@ namespace EcoRide.Data.Repositories
                 using var cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@Id", entity.Id);
                 await cmd.ExecuteNonQueryAsync();
-                Console.WriteLine("Vehicle deleted successfully.");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error deleting vehicle: {ex.Message}");
+                throw new Exception("Error deleting vehicle.", ex);
             }
         }
 
@@ -122,11 +118,10 @@ namespace EcoRide.Data.Repositories
                 cmd.Parameters.AddWithValue("@BasePrice", entity.BasePrice);
                 cmd.Parameters.AddWithValue("@Type", entity.GetType().Name);
                 await cmd.ExecuteNonQueryAsync();
-                Console.WriteLine("Vehicle updated successfully.");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error updating vehicle: {ex.Message}");
+                throw new Exception("Error updating vehicle.", ex);
             }
         }
 
@@ -144,8 +139,7 @@ namespace EcoRide.Data.Repositories
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error checking if vehicle exists: {ex.Message}");
-                return false;
+                throw new Exception("Error checking if vehicle exists.", ex);
             }
         }
 
@@ -168,9 +162,8 @@ namespace EcoRide.Data.Repositories
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error fetching available vehicles: {ex.Message}");
+                throw new Exception("Error fetching available vehicles.", ex);
             }
-            return vehicles;
         }
 
         public async Task MarkAsBookedAsync(string id)
@@ -203,7 +196,7 @@ namespace EcoRide.Data.Repositories
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error marking vehicle as available: {ex.Message}");
+                throw new Exception("Error marking vehicle as available.", ex);
             }
         }
 
@@ -226,8 +219,7 @@ namespace EcoRide.Data.Repositories
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error fetching available vehicles by type: {ex.Message}");
-                return new List<Vehicle>();
+                throw new Exception("Error fetching available vehicles by type.", ex);
             }
         }
     }

@@ -1,6 +1,9 @@
 ﻿using EcoRide.Core.Models.Base;
 using EcoRide.Core.Models.Entities;
 using EcoRide.Core.Services;
+using EcoRide.Core.Strategies.PaymentStretagies;
+using EcoRide.Core.Strategies.PricingStrategies;
+using EcoRide.Data.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -16,78 +19,78 @@ namespace EcoRide
 
         public Facade()
         {
-            _userManager = new();
-            _vehicleManager = new();
-            _bookingManager = new();
-            _paymentManager = new();
+            _userManager = new(new UserRepository());
+            _vehicleManager = new(new VehicleRepository());
+            _bookingManager = new(new BookingRepository(), new VehicleRepository(), new RegularPricingStrategy());
+            _paymentManager = new(new BkashPaymentService(), new BookingRepository());
         }
 
-        public User RegisterUser(string name, string phone)
+        public async Task<User> RegisterUser(string name, string phone)
         {
-            return _userManager.CreateUser(name, phone);
+            return await _userManager.CreateUser(name, phone);
         }
 
-        public User GetUser(string name)
+        public async Task<User> GetUser(string name)
         {
-            return _userManager.GetUserById(name);
+            return await _userManager.GetUserById(name);
         }
 
-        public User UpdateUser(string userId, string name, string phone)
+        public async Task<User> UpdateUser(string userId, string name, string phone)
         {
-            return _userManager.UpdateUserInformation(userId, name, phone);
+            return await _userManager.UpdateUserInformation(userId, name, phone);
         }
 
-        public void DeleteUser(string userId)
+        public async Task DeleteUser(string userId)
         {
-            _userManager.DeleteUser(userId);
+            await _userManager.DeleteUser(userId);
         }
 
-        public List<User> GetUsers()
+        public async Task<List<User>> GetUsers()
         {
-            return _userManager.GetAllUsers();
+            return await _userManager.GetAllUsers();
         }
 
-        public Vehicle RegisterVehicle(string licensePlate, string type)
+        public async Task<Vehicle> RegisterVehicle(string licensePlate, string type)
         {
-            return _vehicleManager.CreateVehicle(licensePlate, type);
+            return await _vehicleManager.CreateVehicle(licensePlate, type);
         }
 
-        public List<Vehicle> GetVehicles()
+        public async Task<List<Vehicle>> GetVehicles()
         {
-            return _vehicleManager.GetVehicles();
+            return await _vehicleManager.GetVehicles();
         }
 
-        public List<Vehicle> GetAvailableVehicles()
+        public async Task<List<Vehicle>> GetAvailableVehicles()
         {
-            return _vehicleManager.GetAvailableVehicles();
+            return await _vehicleManager.GetAvailableVehicles();
         }
 
-        public List<Vehicle> GetAvailableVehiclesByType(string type)
+        public async Task<List<Vehicle>> GetAvailableVehiclesByType(string type)
         {
-            return _vehicleManager.GetAvailableVehiclesByType(type);
+            return await _vehicleManager.GetAvailableVehiclesByType(type);
         }
 
-        public Booking CreateBooking(string userId, string vehicleId, int durationInHour)
+        public async Task<Booking> CreateBooking(string userId, string vehicleId, int durationInHour)
         {
-            return _bookingManager.CreateBooking(userId, vehicleId, durationInHour);
+            return await _bookingManager.CreateBooking(userId, vehicleId, durationInHour);
         }
 
-        public void UnbookVehicle(string vehicleId)
+        public async Task UnbookVehicle(string vehicleId)
         {
-            _bookingManager.unbookVehicle(vehicleId);
+            await _bookingManager.UnbookVehicle(vehicleId);
         }
 
-        public void PayForBooking(string bookingId, decimal amount)
+        public async Task<string> PayForBooking(string bookingId, decimal amount)
         {
-            _paymentManager.ProcessPayment(bookingId, amount);
+            return await _paymentManager.ProcessPayment(bookingId, amount);
         }
 
-        public void DeleteVehicle(string vehicleId)
+        public async Task DeleteVehicle(string vehicleId)
         {
-            var vehicle = _vehicleManager.GetVehicles().Find(v => v.Id == vehicleId);
+            var vehicle = (await _vehicleManager.GetVehicles()).Find(v => v.Id == vehicleId);
             if (vehicle != null)
             {
-                _bookingManager.unbookVehicle(vehicleId);
+                await _bookingManager.UnbookVehicle(vehicleId);
             }
         }
     }

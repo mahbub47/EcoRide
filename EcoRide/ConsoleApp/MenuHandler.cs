@@ -6,7 +6,7 @@ namespace EcoRide.ConsoleApp
 {
     public class MenuHandler
     {
-        public static void DisplayMenu(Facade system)
+        public static async Task DisplayMenu(Facade system)
         {
             bool exit = false;
 
@@ -26,45 +26,46 @@ namespace EcoRide.ConsoleApp
                 Console.WriteLine("8. Display User Informations");
                 Console.WriteLine("9. Display All Vehicles");
                 Console.WriteLine("10. Unbook a vehicle");
+                Console.WriteLine("0. Exit");
                 Console.WriteLine();
 
                 Console.WriteLine("Type 'Exit' to exit");
                 Console.Write("Your selection: ");
 
-                string input = Console.ReadLine();
+                int.TryParse(Console.ReadLine(), out int input);
                 switch (input)
                 {
-                    case "1":
-                        ConsoleUtils.RegisterUser(system);
+                    case 1:
+                        await ConsoleUtils.RegisterUser(system);
                         break;
-                    case "2":
-                        ConsoleUtils.RegisterVehicle(system);
+                    case 2:
+                        await ConsoleUtils.RegisterVehicle(system);
                         break;
-                    case "3":
-                        ConsoleUtils.DisplayAllAvailableVehicles(system);
+                    case 3:
+                        await ConsoleUtils.DisplayAllAvailableVehicles(system);
                         break;
-                    case "4":
-                        ConsoleUtils.DisplayAvailableVehiclesByType(system);
+                    case 4:
+                        await ConsoleUtils.DisplayAvailableVehiclesByType(system);
                         break;
-                    case "5":
-                        ConsoleUtils.BookVehicle(system);
+                    case 5:
+                        await ConsoleUtils.BookVehicle(system);   
                         break;
-                    case "6":
-                        ConsoleUtils.PayForBooking(system);
+                    case 6:
+                        await ConsoleUtils.PayForBooking(system);
                         break;
-                    case "7":
-                        ConsoleUtils.DisplayUsers(system);
+                    case 7:
+                        await ConsoleUtils.DisplayUsers(system);
                         break;
-                    case "8":
-                        ConsoleUtils.DisplayUserInformation(system);
+                    case 8:
+                        await ConsoleUtils.DisplayUserInformation(system);
                         break;
-                    case "9":
-                        ConsoleUtils.DisplayAllVehciles(system);
+                    case 9:
+                        await ConsoleUtils.DisplayAllVehicles(system);
                         break;
-                    case "10":
-                        ConsoleUtils.UnbookVehicle(system);
+                    case 10:
+                        await ConsoleUtils.UnbookVehicle(system);
                         break;
-                    case "exit":
+                    case 0:
                         exit = true;
                         break;
                 }

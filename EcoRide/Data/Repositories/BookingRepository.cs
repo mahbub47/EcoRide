@@ -22,7 +22,7 @@ namespace EcoRide.Data.Repositories
             try
             {
                 using var conn = _connector.Connect();
-                conn.Open();
+                await conn.OpenAsync();
                 var query = "INSERT INTO Bookings (Id, UserId, VehicleId, BookingHour, TotalPrice, PaymentStatus) VALUES (@Id, @UserId, @VehicleId, @BookingHour, @TotalPrice, @PaymentStatus)";
                 using var cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@Id", booking.Id);
@@ -32,11 +32,10 @@ namespace EcoRide.Data.Repositories
                 cmd.Parameters.AddWithValue("@TotalPrice", booking.TotalPrice);
                 cmd.Parameters.AddWithValue("@PaymentStatus", 0);
                 await cmd.ExecuteNonQueryAsync();
-                Console.WriteLine("Booking inserted successfully.");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error inserting booking: {ex.Message}");
+                throw new Exception("Error inserting booking.", ex);
             }
         }
 
@@ -53,7 +52,7 @@ namespace EcoRide.Data.Repositories
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error deleting booking: {ex.Message}");
+                throw new Exception("Error deleting booking.", ex);
             }
         }
 
@@ -70,7 +69,7 @@ namespace EcoRide.Data.Repositories
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error deleting booking by vehicle: {ex.Message}");
+                throw new Exception("Error deleting booking by vehicle.", ex);
             }
         }
 
@@ -88,8 +87,7 @@ namespace EcoRide.Data.Repositories
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error checking booking existence: {ex.Message}");
-                return false;
+                throw new Exception("Error checking booking existence.", ex);
             }
         }
 
@@ -103,15 +101,14 @@ namespace EcoRide.Data.Repositories
                 using var cmd = new SqlCommand(query, conn);
                 using var reader = await cmd.ExecuteReaderAsync();
                 var bookings = new List<Booking>();
-                while (reader.Read()) {
-                    bookings.Add(new Booking(reader.GetString(1), reader.GetString(2), reader.GetInt32(3), reader.GetDecimal(4), reader.GetBoolean(5)));
+                while (await reader.ReadAsync()) {
+                    bookings.Add(new Booking(reader.GetString(0),reader.GetString(1), reader.GetString(2), reader.GetInt32(3), reader.GetDecimal(4), reader.GetBoolean(5)));
                 }
                 return bookings;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error retrieving bookings: {ex.Message}");
-                return Enumerable.Empty<Booking>();
+                throw new Exception("Error retrieving bookings.", ex);
             }
         }
 
@@ -125,16 +122,15 @@ namespace EcoRide.Data.Repositories
                 using var cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@Id", id);
                 using var reader = await cmd.ExecuteReaderAsync();
-                if (reader.Read())
+                if (await reader.ReadAsync())
                 {
-                    return new Booking(reader.GetString(1), reader.GetString(2), reader.GetInt32(3), reader.GetDecimal(4), reader.GetBoolean(5));
+                    return new Booking(reader.GetString(0),reader.GetString(1), reader.GetString(2), reader.GetInt32(3), reader.GetDecimal(4), reader.GetBoolean(5));
                 }
                 return null;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error retrieving booking by ID: {ex.Message}");
-                return null;
+                throw new Exception("Error retrieving booking by ID.", ex);
             }
         }
 
@@ -151,7 +147,7 @@ namespace EcoRide.Data.Repositories
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error marking booking as paid: {ex.Message}");
+                throw new Exception("Error marking booking as paid.", ex);
             }
         }
 
@@ -169,11 +165,10 @@ namespace EcoRide.Data.Repositories
                 cmd.Parameters.AddWithValue("@BookingHour", booking.DurationInHours);
                 cmd.Parameters.AddWithValue("@TotalPrice", booking.TotalPrice);
                 await cmd.ExecuteNonQueryAsync();
-                Console.WriteLine("Booking updated successfully.");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error updating booking: {ex.Message}");
+                throw new Exception("Error updating booking.", ex);
             }
         }
     }

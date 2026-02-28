@@ -29,7 +29,7 @@ namespace EcoRide.Data.Repositories
                 using var reader = await cmd.ExecuteReaderAsync();
                 if (await reader.ReadAsync())
                 {
-                    return new User(reader.GetString(1), reader.GetString(2))
+                    return new User(reader["Id"].ToString(), reader["Name"].ToString(), reader["Phone"].ToString())
                     {
                         Id = reader.GetString(0)
                     };
@@ -38,8 +38,7 @@ namespace EcoRide.Data.Repositories
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred while fetching the user: {ex.Message}");
-                return null;
+                throw new Exception("An error occurred while fetching the user.", ex);
             }
         }
 
@@ -55,7 +54,7 @@ namespace EcoRide.Data.Repositories
                 using var reader = await cmd.ExecuteReaderAsync();
                 while (await reader.ReadAsync())
                 {
-                    users.Add(new User(reader.GetString(1), reader.GetString(2))
+                    users.Add(new User(reader.GetString(0), reader.GetString(1), reader.GetString(2))
                     {
                         Id = reader.GetString(0)
                     });
@@ -63,7 +62,7 @@ namespace EcoRide.Data.Repositories
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred while fetching all users: {ex.Message}");
+                throw new Exception("An error occurred while fetching all users.", ex);
             }
             return users;
         }
@@ -80,11 +79,10 @@ namespace EcoRide.Data.Repositories
                 cmd.Parameters.AddWithValue("@Name", user.Name);
                 cmd.Parameters.AddWithValue("@Phone", user.Phone);
                 await cmd.ExecuteNonQueryAsync();
-                Console.WriteLine("User added successfully.");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred while inserting the user: {ex.Message}");
+                throw new Exception("An error occurred while inserting the user.", ex);
             }
         }
 
@@ -101,7 +99,7 @@ namespace EcoRide.Data.Repositories
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred while deleting the user: {ex.Message}");
+                throw new Exception("An error occurred while deleting the user.", ex);
             }
         }
 
@@ -117,11 +115,10 @@ namespace EcoRide.Data.Repositories
                 cmd.Parameters.AddWithValue("@Name", user.Name);
                 cmd.Parameters.AddWithValue("@Phone", user.Phone);
                 await cmd.ExecuteNonQueryAsync();
-                Console.WriteLine("User updated successfully.");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred while updating the user: {ex.Message}");
+                throw new Exception("An error occurred while updating the user.", ex);
             }
         }
 
@@ -134,13 +131,13 @@ namespace EcoRide.Data.Repositories
                 string query = "SELECT COUNT(1) FROM Users WHERE Id = @Id";
                 using var cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@Id", id);
-                int count = (int)cmd.ExecuteScalar();
+                var result = await cmd.ExecuteScalarAsync();
+                int count = (int)result;
                 return count > 0;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred while checking if the user exists: {ex.Message}");
-                return false;
+                throw new Exception("An error occurred while checking if the user exists.", ex);
             }
         }
     } 

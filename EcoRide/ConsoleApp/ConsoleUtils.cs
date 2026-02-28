@@ -6,35 +6,35 @@ namespace EcoRide.ConsoleApp
 {
     public static class ConsoleUtils
     {
-        public static void RegisterUser(Facade system)
+        public static async Task RegisterUser(Facade system)
         {
             Console.WriteLine("Enter user name:");
             string name = Console.ReadLine();
             Console.WriteLine("Enter user phone:");
             string phone = Console.ReadLine();
-            var user = system.RegisterUser(name, phone);
+            var user = await system.RegisterUser(name, phone);
             Console.WriteLine($"User registered with ID: {user.Id}");
         }
 
-        public static void RegisterVehicle(Facade system)
+        public static async Task RegisterVehicle(Facade system)
         {
             Console.WriteLine("Enter vehicle license plate:");
             string licensePlate = Console.ReadLine();
             Console.WriteLine("Select vehicle type 1.Car 2.Bike");
-            string selectedType = Console.ReadLine();
+            int.TryParse(Console.ReadLine(), out int selectedType);
             string type = selectedType switch
             {
-                "1" => "Car",
-                "2" => "Bike",
+                1 => "Car",
+                2 => "Bike",
                 _ => throw new ArgumentException("Invalid vehicle type selected.")
             };
-            var vehicle = system.RegisterVehicle(licensePlate, type);
+            var vehicle = await system.RegisterVehicle(licensePlate, type);
             Console.WriteLine($"Vehicle registered with ID: {vehicle.Id}");
         }
 
-        public static void DisplayAllAvailableVehicles(Facade system)
+        public static async Task DisplayAllAvailableVehicles(Facade system)
         {
-            var vehicles = system.GetAvailableVehicles();
+            var vehicles = await system.GetAvailableVehicles();
             if (vehicles.Count == 0)
             {
                 Console.WriteLine("No available vehicles.");
@@ -47,17 +47,17 @@ namespace EcoRide.ConsoleApp
             }
         }
 
-        public static void DisplayAvailableVehiclesByType(Facade system)
+        public static async Task DisplayAvailableVehiclesByType(Facade system)
         {
             Console.WriteLine("Select vehicle type 1.Car 2.Bike");
-            string selectedType = Console.ReadLine();
+            int.TryParse(Console.ReadLine(), out int selectedType);
             string type = selectedType switch
             {
-                "1" => "Car",
-                "2" => "Bike",
+                1 => "Car",
+                2 => "Bike",
                 _ => throw new ArgumentException("Invalid vehicle type selected.")
             };
-            var vehicles = system.GetAvailableVehiclesByType(type);
+            var vehicles = await system.GetAvailableVehiclesByType(type);
             if (vehicles.Count == 0)
             {
                 Console.WriteLine($"No available {type.ToLower()}s.");
@@ -70,7 +70,7 @@ namespace EcoRide.ConsoleApp
             }
         }
 
-        public static void BookVehicle(Facade system)
+        public static async Task BookVehicle(Facade system)
         {
             Console.WriteLine("Enter user ID:");
             string userId = Console.ReadLine();
@@ -78,22 +78,23 @@ namespace EcoRide.ConsoleApp
             string vehicleId = Console.ReadLine();
             Console.WriteLine("Enter duration in hours:");
             int duration = int.Parse(Console.ReadLine());
-            var booking = system.CreateBooking(userId, vehicleId, duration);
+            var booking = await system.CreateBooking(userId, vehicleId, duration);
             Console.WriteLine($"Booking created with ID: {booking.Id}, Total Price: {booking.TotalPrice}");
         }
 
-        public static void PayForBooking(Facade system)
+        public static async Task PayForBooking(Facade system)
         {
             Console.WriteLine("Enter booking ID:");
             string bookingId = Console.ReadLine();
             Console.WriteLine("Enter payment amount:");
             decimal amount = decimal.Parse(Console.ReadLine());
-            system.PayForBooking(bookingId, amount);
+            var result = await system.PayForBooking(bookingId, amount);
+            Console.WriteLine(result);
         }
 
-        public static void DisplayUsers(Facade system)
+        public static async Task DisplayUsers(Facade system)
         {
-            var users = system.GetUsers();
+            var users = await system.GetUsers();
             if (users.Count == 0)
             {
                 Console.WriteLine("No registered users.");
@@ -106,11 +107,11 @@ namespace EcoRide.ConsoleApp
             }
         }
 
-        public static void DisplayUserInformation(Facade system)
+        public static async Task DisplayUserInformation(Facade system)
         {
             Console.WriteLine("Enter user ID:");
             string userId = Console.ReadLine();
-            var user = system.GetUser(userId);
+            var user = await system.GetUser(userId);
             if (user == null)
             {
                 Console.WriteLine("User not found.");
@@ -119,9 +120,9 @@ namespace EcoRide.ConsoleApp
             Console.WriteLine($"User ID: {user.Id}, Name: {user.Name}, Phone: {user.Phone}");
         }
 
-        public static void DisplayAllVehciles(Facade system)
+        public static async Task DisplayAllVehicles(Facade system)
         {
-            var vehicles = system.GetVehicles();
+            var vehicles = await system.GetVehicles();
             if (vehicles.Count == 0)
             {
                 Console.WriteLine("No registered vehicles.");
@@ -135,27 +136,27 @@ namespace EcoRide.ConsoleApp
             }
         }
 
-        public static void UnbookVehicle(Facade system)
+        public static async Task UnbookVehicle(Facade system)
         {
             Console.WriteLine("Enter vehicle ID:");
             string vehicleId = Console.ReadLine();
-            system.UnbookVehicle(vehicleId);
+            await system.UnbookVehicle(vehicleId);
             Console.WriteLine("Vehicle unbooked successfully.");
         }
 
-        public static void DeleteUser(Facade system)
+        public static async Task DeleteUser(Facade system)
         {
             Console.WriteLine("Enter user ID:");
             string userId = Console.ReadLine();
-            system.DeleteUser(userId);
+            await system.DeleteUser(userId);
             Console.WriteLine("User deleted successfully.");
         }
 
-        public static void DeleteVehicle(Facade system)
+        public static async Task DeleteVehicle(Facade system)
         {
             Console.WriteLine("Enter vehicle ID:");
             string vehicleId = Console.ReadLine();
-            system.DeleteVehicle(vehicleId);
+            await system.DeleteVehicle(vehicleId);
             Console.WriteLine("Vehicle deleted successfully.");
         }
     }

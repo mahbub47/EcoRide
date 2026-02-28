@@ -12,31 +12,35 @@ namespace EcoRide.Core.Services
     {
         private readonly VehicleRepository _vehicleRepository;
 
-        public VehicleManager()
+        public VehicleManager(VehicleRepository vehicleRepository)
         {
-            _vehicleRepository = new VehicleRepository();
+            _vehicleRepository = vehicleRepository;
         }
 
-        public Vehicle CreateVehicle(string plateNo, string type)
+        public async Task<Vehicle> CreateVehicle(string plateNo, string type)
         {
             var vehicle = VehicleFactory.CreateVehicle(type, Guid.NewGuid().ToString(), plateNo, true);
-            _vehicleRepository.AddAsync(vehicle).Wait();
-            return vehicle;
+            await _vehicleRepository.AddAsync(vehicle);
+            var createdVehicle = await _vehicleRepository.GetByIdAsync(vehicle.Id);
+            return createdVehicle;
         }
 
-        public List<Vehicle> GetVehicles()
+        public async Task<List<Vehicle>> GetVehicles()
         {
-            return _vehicleRepository.GetAllAsync().Result.ToList();
+            var vehicles = await _vehicleRepository.GetAllAsync();
+            return vehicles.ToList();
         }
 
-        public List<Vehicle> GetAvailableVehicles()
+        public async Task<List<Vehicle>> GetAvailableVehicles()
         {
-            return _vehicleRepository.GetAvailableVehicle().Result.ToList();
+            var vehicles = await _vehicleRepository.GetAvailableVehicle();
+            return vehicles.ToList();
         }
 
-        public List<Vehicle> GetAvailableVehiclesByType(string type)
+        public async Task<List<Vehicle>> GetAvailableVehiclesByType(string type)
         {
-            return _vehicleRepository.GetAvailableVehicleByType(type).Result.ToList();
+            var vehicles = await _vehicleRepository.GetAvailableVehicleByType(type);
+            return vehicles.ToList();
         }
     }
 }
